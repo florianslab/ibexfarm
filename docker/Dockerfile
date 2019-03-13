@@ -81,13 +81,14 @@ RUN cpanm --notest --no-man-pages --no-wget --curl \
 
 # Set up deployment dirs.
 RUN mkdir /var/ibexfarm && \
-    git clone https://github.com/addrummond/ibexfarm.git /var/ibexfarm/ibexfarm && \
+    git clone https://github.com/PennController/ibexfarm.git /var/ibexfarm/ibexfarm && \
     chown -R apache:apache /var/ibexfarm/
 
 # Checkout the revision of github.com/addrummond/ibex corresponding to 0.3.9
 # and create a tarball.
+# Jeremy: custom fork
 RUN cd /tmp && \
-    git clone https://github.com/addrummond/ibex && \
+    git clone https://github.com/PennController/ibex.git && \
     cd ibex && \
     git checkout 9e903f9 && \
     rm -rf .git* && \
