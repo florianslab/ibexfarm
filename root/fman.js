@@ -300,6 +300,8 @@ $.widget("ui.browseFile", {
                 var buttonpaneFirstButton = null; // Ditto.
                 var savedMessageCurrentlyShowing = false;
                 function save(closeAfter) {
+	 	    buttonpane = $('.ui-dialog div.ui-dialog-buttonpane');
+                    buttonpaneFirstButton = $(buttonpane.find('button')[0]);
                     return function () {
                         spinnifyPOST(
                             buttonpane,
@@ -360,8 +362,6 @@ $.widget("ui.browseFile", {
                         "Save and close": save(true)
                     }
                 });
-                buttonpane = $('.ui-dialog div.ui-dialog-buttonpane');
-                buttonpaneFirstButton = $(buttonpane.find('button')[0]);
 
                 spinnifyGET(editdialog, downloadLink, function (data) {
                     editdialog.append(editte = $("<div>"));
