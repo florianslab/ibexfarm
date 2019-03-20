@@ -128,6 +128,11 @@ $.widget("ui.flash", {
       this.element.css({transition: "background-color 0ms linear", "background-color": color});
       setTimeout(()=>{
           this.element.css({transition: "background-color 750ms linear", "background-color": old});
+          setTimeout(()=>{
+              this.element.attr('id', null);
+              if (this.element.options.finishedCallback)
+                  this.element.options.finishedCallback.call(this.element);
+          }, 750);
       }, 1750);
     }
 });
