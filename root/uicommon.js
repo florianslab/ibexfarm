@@ -107,7 +107,7 @@ $.widget("ui.flash", {
         if (this.options.type == 'message') { color = 'yellow'; }
         // WEIRD!
         // 'highlight' effect appears not to work in Chrome (beta, OS X) (jQuery bug?)
-        if (! isChrome) {
+        /*if (! isChrome) {
             this.element.effect("highlight", {color: color}, 2500, function () {
                 t.element.attr('id', null);
                 if (t.options.finishedCallback)
@@ -122,7 +122,13 @@ $.widget("ui.flash", {
                 if (t.options.finishedCallback)
                     t.options.finishedCallback.call(t.element);
             }, 2500);
-        }
+        }*/
+      // JEREMY: cross-browser all-CSS solution
+      var old = this.element.css('background-color');
+      this.element.css({transition: "background-color 0ms linear", "background-color": color});
+      setTimeout(()=>{
+          this.element.css({transition: "background-color 750ms linear", "background-color": old});
+      }, 1750);
     }
 });
 })(navigator.userAgent && navigator.userAgent.search(/Chrome/) != -1);
