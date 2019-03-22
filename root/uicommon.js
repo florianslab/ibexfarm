@@ -130,8 +130,8 @@ $.widget("ui.flash", {
           this.element.css({transition: "background-color 750ms linear", "background-color": old});
           setTimeout(()=>{
               this.element.attr('id', null);
-              if (this.element.options.finishedCallback)
-                  this.element.options.finishedCallback.call(this.element);
+              if (this.options.finishedCallback)
+                  this.options.finishedCallback.call(this.element);
           }, 750);
       }, 1750);
     }
