@@ -1,7 +1,7 @@
 [% USE HTML %]
 [% USE URL %]
 [% META title = '- Manage Experiment' %]
-[% META external_js_scripts = '/static/ace/src-min-noconflict/ace.js' '/static/ace/src-min-noconflict/ext-language_tools.js' %]
+[% META external_js_scripts = '/static/ace/src-min-noconflict/ace.js /static/ace/src-min-noconflict/ext-language_tools.js' %]
 [% META external_css_files = '/static/jqueryui/jquery-ui-1.8.4.custom.css' %]
 [% META js_scripts = 'uicommon.js ajaxupload.js fman.js' %]
 
