@@ -279,8 +279,6 @@ $.widget("ui.browseFile", {
         }
         if (edit) {
             edit.click(function () {
-                var HEIGHT_SAFETY_MARGIN = 5; // px
-                var editte = null;
                 var editor = null;
 
                 var highlightConfig;
@@ -291,102 +289,138 @@ $.widget("ui.browseFile", {
                     highlightConfig = EXTENSION_TO_HIGHLIGHT_CONFIG[''];
 
                 $("body").css('overflow', 'hidden');
-                var editdialog = $("<div>");
+
                 function cleanup() {
                     $("body").css('overflow', 'scroll');
                     $(this).remove();
                 }
-                var buttonpane = null; // Set in a minute.
-                var buttonpaneFirstButton = null; // Ditto.
-                var savedMessageCurrentlyShowing = false;
+            
+                var editor;
+                var editdialog = $("<div>");
+                var stat = $("<div>").css({display: "inline-block", margin: "5px"}).text("");
+            
                 function save(closeAfter) {
-	 	    buttonpane = $('.ui-dialog div.ui-dialog-buttonpane');
-                    buttonpaneFirstButton = $(buttonpane.find('button')[0]);
-                    return function () {
+                    return function (callback) {
+                        stat.text("saving");
+                        stat.css("visibility","visible");
                         spinnifyPOST(
-                            buttonpane,
+                            stat,
                             BASE_URI + 'ajax/upload_file/' + escape(EXPERIMENT) + '/' + escape(t.options.dir) + '/' + escape(t.options.filename),
-                            { contents: editor.getCode() },
+                            { contents: editor.getValue() },
                             function () {
                                 if (closeAfter) {
                                     cleanup.call(editdialog);
-                                    download.flash();
+                                    // download.flash();
                                 }
-                                else if (! savedMessageCurrentlyShowing) {
-                                    savedMessageCurrentlyShowing = true;
-                                    // TODO: Maybe put some of this in a CSS file.
-                                    buttonpane.append($("<div>")
-                                                      .text("(saved)")
-                                                      .css('float', 'right').css('margin-right', '0.5em')
-                                                      .css('padding-left', '0.5em').css('padding-right', '0.5em')
-                                                      .css('font-family', buttonpaneFirstButton.css('font-family'))
-                                                      .css('font-size', buttonpaneFirstButton.css('font-size'))
-                                                      .css('font-weight', 'bold')
-                                                      .css('position', 'relative')
-                                                      .css('top', buttonpaneFirstButton.css('padding-top'))
-                                                      .css('margin-top', buttonpane.css('margin-top')).flash({
+                                else {
+                                    stat.text("saved").flash({
                                         type: 'message',
                                         finishedCallback: function() {
-                                            this.remove();
-                                            savedMessageCurrentlyShowing = false;
+                                            stat.css("visibility","hidden");
                                         }
-                                    }));
+                                    });
                                 }
+                                if (callback && callback instanceof Function)
+                                    callback.call();
                             },
                             null/*type*/,
-                            false/*dontWait*/,
-                            function(div) { div.css('float', 'right').css('margin-right', '1em').css('margin-top', buttonpane.css('margin-top')); }
+                            false/*dontWait*/
                         );
                     }
                 }
+            
+                let href = BASE_URI + $("#username")[0].innerHTML + '/' + EXPERIMENT + '/experiment.html';
+                let link;
+                let openLink = function(){
+                    if (link && link.location && link.location.href==href)
+                        return;
+                    link = window.open('','_blank');
+                };
+            
                 editdialog.dialog({
                     closeOnEscape: false,
                     modal: true,
                     position: [25, 25],
-                    title: t.options.filename,
+                    title: "test",
                     width: ($(window).width() - 50),
                     height: ($(window).height() - 50),
                     minWidth: 420,
                     minHeight: 450,
-                    // CodeMirror resizes itself width-wise just fine, but its vertical resizing seems
-                    // to be broken when embedded inside a jQuery dialog, so we do this manually.
-                    resize: function () {
-                        if (editor && editor.wrapping) {
-                            $(editor.wrapping).height($(this).height() - HEIGHT_SAFETY_MARGIN);
-                        }
-                    },
-                    close: cleanup,
                     buttons: {
                         "Discard changes": cleanup,
                         "Save changes": save(false),
-                        "Save and close": save(true)
+                        "Save and close": save(true),
+                        "Save and test": function(){openLink(); save(false).call(this, ()=>{link.location=href;link.focus();}); },
+                    },
+                    open: function(){
+                        $(this).parent().find("div.ui-dialog-buttonpane div.ui-dialog-buttonset").prepend(stat).prepend($(link));
+                        stat.css("visibility","none");
                     }
                 });
-
+            
+            
                 spinnifyGET(editdialog, downloadLink, function (data) {
-                    editdialog.append(editte = $("<div>"));
-
-                    var prepath = BASE_URI + "static/codemirror/";
-                    function pre(o) {
-                        if (typeof(o) == "object") {
-                            var oo = new Array(o.length);
-                            for (var i = 0; i < o.length; ++i)
-                                oo[i] = prepath + o[i];
-                            return oo;
-                        }
-                        else return prepath + o;
-                    }
-                    editor = new CodeMirror(CodeMirror.replace(editte[0]), {
-                        path: prepath,
-                        parserfile: pre(highlightConfig.parserfile),
-                        stylesheet: pre(highlightConfig.stylesheet),
-                        indentUnit: highlightConfig.indentUnit || 2,
-                        lineNumbers: true,
-                        content: data,
-                        width: "dynamic",
-                        textWrapping: false
+                    var editte = $("<div>").attr('id', 'editor');
+                    editdialog.append(editte);
+                    editor = ace.edit(editdialog[0], {
+                        mode: "ace/mode/javascript",
+                        selectionStyle: "text"
                     });
-                    $(editor.wrapping).height(editdialog.height() - HEIGHT_SAFETY_MARGIN);
+                    editor.session.setValue(data);
+                    editor.setShowPrintMargin(false);
+                    editor.setOptions({
+                        enableBasicAutocompletion: true,
+                        enableSnippets: true,
+                        enableLiveAutocompletion: true
+                    });
+            
+                    var ACglobalPattern = new RegExp("/[*]! ([$]AC[$] .+? [$]AC[$]) [*]/", "g");
+                    var ACpattern = new RegExp("[$]AC[$] ([^.]+?)[.]([^\\s]+?) (.+?) [$]AC[$]", "g");
+                    let ACcommands = [];
+                    var langTools = ace.require("ace/ext/language_tools");
+                    $.get(BASE_URI + 'ibexexps/' + $("#username")[0].innerHTML + '/' + EXPERIMENT + '/server.py?include=js', function(data) {
+                        let AC;
+                        while ((AC = ACglobalPattern.exec(data)) !== null){
+                            let command;
+                            while ((command = ACpattern.exec(AC[1])) !== null)
+                                ACcommands.push(command);
+                        }
+                        var staticWordCompleter = {
+                            getCompletions: function(editor, session, pos, prefix, callback) {
+                                callback(null, ACcommands.map(function(command) {
+                                    let value = command[2], par = value.indexOf("(");
+                                    if (par>0) value = value.substring(0,par);
+                                    let caption = value;
+                                    if (command[1].match(/PElement/))
+                                        caption = command[1].split(" ")[0] + "." + value;
+                                    return {
+                                        caption: caption,
+                                        value: value,
+                                        meta: command[1],
+                                        description: command[3],
+                                        command: command[2]
+                                    };
+                                }));
+                    
+                            },
+                            getDocTooltip: function(item) {
+                                let lang = ace.require("ace/lib/lang")
+                                if (!item.docHTML) {
+                                    if (item.type == "snippet")
+                                        item.docHTML = [
+                                            "<b>", lang.escapeHTML(item.caption), "</b>", "<hr></hr>",
+                                            lang.escapeHTML(item.snippet)
+                                        ].join("");
+                                    else if (item.description)
+                                        item.docHTML = [
+                                            "<b>", lang.escapeHTML(item.meta) , "." , lang.escapeHTML(item.command), "</b>", "<hr></hr>",
+                                            lang.escapeHTML(item.description)
+                                        ].join("");
+                                }
+                            }
+                        };
+                        langTools.addCompleter(staticWordCompleter);
+                    }, "text");
                 }, "text/plain" /* "json" by default */);
             });
         }
