@@ -43,8 +43,9 @@ RUN cd /tmp && \
     sed -i s/__uint8_t/uint8_t/g rijndael.h && \
     sed -i s/__uint32_t/uint32_t/g rijndael.h && make install
 
+# JEREMY: adding metacpan as a mirror (3/22/19: Test-WWW-Mechanize-PSGI not up to date on cpan)
 # Install the remaining required perl modules using cpanm.
-RUN cpanm --notest --no-man-pages --no-wget --curl \
+RUN cpanm --mirror https://cpan.metacpan.org/ --notest --no-man-pages --no-wget --curl \
     Moose \
     MooseX::Types \
     MooseX::ConfigFromFile \
@@ -79,9 +80,12 @@ RUN cpanm --notest --no-man-pages --no-wget --curl \
     Archive::Tar \
     Catalyst::Plugin::ConfigLoader::Environment
 
+# JEREMY: don't use cache here, as I make frequent updates
+ADD https://api.github.com/repos/penncontroller/ibexfarm/git/refs/heads/master version.json
+# JEREMY: adding -b master here
 # Set up deployment dirs.
 RUN mkdir /var/ibexfarm && \
-    git clone https://github.com/penncontroller/ibexfarm.git /var/ibexfarm/ibexfarm && \
+    git clone -b master https://github.com/penncontroller/ibexfarm.git /var/ibexfarm/ibexfarm && \
     chown -R apache:apache /var/ibexfarm/
 
 # Checkout the revision of github.com/penncontroller/ibex corresponding to 0.3.9
