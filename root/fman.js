@@ -329,7 +329,7 @@ $.widget("ui.browseFile", {
                     }
                 }
             
-                let href = BASE_URI + $("#username")[0].innerHTML + '/' + EXPERIMENT + '/experiment.html';
+                let href = BASE_URI + 'ibexexps/' + $("#username")[0].innerHTML + '/' + EXPERIMENT + '/experiment.html';
                 let link;
                 let openLink = function(){
                     if (link && link.location && link.location.href==href)
@@ -346,6 +346,7 @@ $.widget("ui.browseFile", {
                     height: ($(window).height() - 50),
                     minWidth: 420,
                     minHeight: 450,
+		    close: cleanup,
                     buttons: {
                         "Discard changes": cleanup,
                         "Save changes": save(false),
