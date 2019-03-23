@@ -341,7 +341,7 @@ $.widget("ui.browseFile", {
                     closeOnEscape: false,
                     modal: true,
                     position: [25, 25],
-                    title: "test",
+                    title: t.options.filename,
                     width: ($(window).width() - 50),
                     height: ($(window).height() - 50),
                     minWidth: 420,
@@ -356,6 +356,10 @@ $.widget("ui.browseFile", {
                     open: function(){
                         $(this).parent().find("div.ui-dialog-buttonpane div.ui-dialog-buttonset").prepend(stat).prepend($(link));
                         stat.css("visibility","none");
+			$("a.ui-dialog-titlebar-close").before(
+				$('#login_info a[rel="external"]').clone()
+					.css({float: 'right', 'margin-right': '20px', color: 'white'});
+			);
                     }
                 });
             
