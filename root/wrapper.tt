@@ -53,14 +53,14 @@
 </style>
 <![endif]-->
 [% END %]
-<title>Ibex farm [% template.title or '' %]</title>
+<title>PCIbex farm [% template.title or '' %]</title>
 </head>
 <body>
 
 <div id="outer1">
 <div id="outer2">
 
-<h1>Ibex Farm</h1>
+<h1>PCIbex Farm</h1>
 
 <div id="login_info">
 
