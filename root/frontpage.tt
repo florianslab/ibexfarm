@@ -1,5 +1,5 @@
 <h2>Welcome to the Ibex farm</h2>
-<a id="ibex" href="https://commons.wikimedia.org/wiki/File:Capra_ibex_ibex_%E2%80%93_04.jpg"></a>
+<a id="ibex" href="https://www.pcibex.net/"></a>
 [% IF c.user_exists %]
 <p>
 <a href="[% c.uri_for("/myaccount") %]">&raquo; manage my experiments</a>
