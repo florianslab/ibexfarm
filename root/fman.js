@@ -358,8 +358,7 @@ $.widget("ui.browseFile", {
                         stat.css("visibility","none");
 			$("a.ui-dialog-titlebar-close").before(
 				$('#login_info a[rel="external"]').clone()
-					.css({float: 'right', 'margin-right': '20px', color: 'white'});
-			);
+					.css({float: 'right','margin-right': '20px',color: 'white'}));
                     }
                 });
             
