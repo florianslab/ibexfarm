@@ -332,8 +332,10 @@ $.widget("ui.browseFile", {
                 let href = BASE_URI + 'ibexexps/' + $("#username")[0].innerHTML + '/' + EXPERIMENT + '/experiment.html';
                 let link;
                 let openLink = function(){
-                    if (link && link.location && link.location.href==href)
-                        return;
+		    try{
+                    	if (link && link.location && link.location.href==href)
+                        	link.close();
+		    }catch(err){}
                     link = window.open('','_blank');
                 };
             
