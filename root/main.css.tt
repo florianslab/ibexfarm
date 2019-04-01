@@ -55,11 +55,17 @@ div#outer2 {
 
 a#ibex {
     display: block;
-    width: 250px;
-    height: 193px;
+    width: 150px;
+    height: 200px;
     background-color: [% inner_background %];
     background-image: url('[% BASE_URI _ 'static/images/pcibex-logo.jpg'%]');
     background-repeat: no-repeat;
+    background-size: cover;
+    float: left;
+    margin-right: 2em;
+}
+a#ibex + p {
+    margin-top: 4em;
 }
 
 div#login_info {
